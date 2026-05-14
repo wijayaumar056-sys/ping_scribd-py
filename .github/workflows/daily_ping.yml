@@ -1,0 +1,27 @@
+name: Daily Scribd Indexing Ping
+
+on:
+  schedule:
+    # Berjalan otomatis setiap jam 00:00 WITA (16:00 UTC)
+    - cron: '0 16 * * *'
+  workflow_dispatch: 
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    - name: Set up Python
+      uses: actions/set up-python@v4
+      with:
+        python-version: '3.9'
+
+    - name: Install dependencies
+      run: |
+        pip install requests
+
+    - name: Run Ping Script
+      run: python ping_scribd.py
