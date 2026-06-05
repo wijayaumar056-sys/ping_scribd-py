@@ -10,13 +10,12 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
-    # Memberikan izin agar GitHub Actions bisa menulis/mengubah file di repositori Anda
-    permissions:
-      contents: write
-
     steps:
     - name: Checkout repository
       uses: actions/checkout@v3
+      with:
+        # Mengambil riwayat git secara penuh agar proses commit valid
+        fetch-depth: 0
 
     - name: Set up Python
       uses: actions/setup-python@v4
@@ -30,15 +29,9 @@ jobs:
     - name: Run Ping Script
       run: python ping_scribd.py
 
-    # --- LANGKAH BARU DI BAWAH INI UNTUK MENYELAMATKAN URLS.TXT ---
-    - name: Commit and Push changes
-      run: |
-        # Mengatur identitas otomatis agar Git tidak memunculkan eror "empty ident name"
-        git config --local user.email "action@github.com"
-        git config --local user.name "GitHub Action Bot"
-        
-        # Mengecek apakah ada perubahan urutan di urls.txt
-        git add urls.txt
-        
-        # Jika ada perubahan, simpan dan push balik ke repositori Anda
-        git diff --quiet && git diff --staged --quiet || (git commit -m "🔄 Otomatisasi: Rotasi antrean 5 URL teratas ke bawah" && git push)
+    # --- MENGGUNAKAN PLUGINS RESMI YANG DIJAMIN LOLOS PROTEKSI GIT ---
+    - name: Commit & Push Changes Automatically
+      uses: stefanzweifel/git-auto-commit-action@v4
+      with:
+        commit_message: "🔄 Otomatisasi: Rotasi antrean 5 URL teratas ke bawah"
+        file_pattern: 'urls.txt'
